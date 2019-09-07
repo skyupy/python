@@ -1,0 +1,95 @@
+#八皇后解法
+
+#寻找上一行的皇后的位置并撤回
+def find_lastchess(plant ,i):
+    for k in range (n):
+        if plant[i][k]==1:
+            break    
+    return (k)
+#判断最后能否放皇后
+def make_judge (plant,i,j):
+    if j < n:
+        if plant[i][j] == 0 :
+            if i < n-1:
+                plant = set_range (plant,i,j)
+#                print_result(plant)#测试
+                make_judge (plant,i+1,0)
+            else :#如果最后一行还有0那就得到了结果
+                plant[i][j] = 1 
+                print_result(plant)#打印出结果，并累计答案数量
+                resultsRecord = plant [0] #记录结果个数
+                k = find_lastchess(plant,0)#查找这个结果的第一行的皇后在哪,如果不是最后一个，那么要再搜索
+                if k < 2 :
+                    plantNew = [[0 for i in range(n)] for i in range(n)]
+                    make_judge (plantNew,0,find_lastchess(plant,0)+1)
+
+        elif plant[i][j] > 1:
+            if j < n-1:
+                make_judge (plant,i,j+1)
+            else:
+                make_judge (plant,i-1,find_lastchess(plant,i-1))
+
+        elif plant[i][j] == 1:
+            cancle_range(plant,i,j)
+            if j<n-1:
+                make_judge (plant,i,j+1)
+            else:
+                make_judge (plant,i-1,find_lastchess(plant,i-1))
+#落子后设置攻击范围
+def set_range(plant,i,j):
+    plant[i][j] = 1
+    k = 1#从（i,j)位置开始竖均为攻击范围
+    while (i+k<n):
+        plant[i+k][j] += 2
+        k += 1
+    k = 1#从（i,j)位置开始右下斜均为攻击范围
+    while (i+k<n and j+k<n):
+        plant[i+k][j+k] += 2
+        k += 1 
+    k = 1#从（i,j)位置开始左下斜均为攻击范围
+    while (j-k>-1 and i+k<n):
+        plant[i+k][j-k] += 2
+        k +=1
+    return (plant)
+
+#撤子后取消攻击范围
+def cancle_range(plant,i,j):
+    plant[i][j] = 0
+    k = 1#从（i,j)位置开始竖恢复攻击范围
+    while (i+k<n):
+        #if (weather_queen(plant,i,j,n):
+        plant[i+k][j] -= 2
+        k += 1
+    k = 1#从（i,j)位置开始右下斜恢复攻击范围
+    while (i+k<n and j+k<n):
+        #if (weather_queen(plant,i,j,n):
+        plant[i+k][j+k] -= 2
+        k += 1 
+    k = 1#从（i,j)位置开始左下斜恢复攻击范围
+    while (j-k>-1 and i+k<n):
+        plant[i+k][j-k] -= 2
+        k +=1
+    return (plant)
+
+
+#打印一组结果
+def print_result(plant):
+    for i in range(n):
+        for j in range(n):
+            if i==0 and plant[i][j]==1:
+                number = j
+            if plant[i][j] == 1:
+                #print(plant[i][j],end = ' ')# ("Q",end = ' ')
+                print ("Q",end = ' ')
+            else :
+                print ("*",end = ' ')
+        print ("\n")
+    print ('\n')
+    return (number)
+
+#定义空棋盘注意深拷贝与浅拷贝的区别（如果棋盘是0则为空，若为1则有皇后，若为2则为其它皇后的攻击范围）
+n = int (input ("棋盘的大小"))
+chessPlant=[[0 for i in range(n)] for i in range(n)]
+#从第一行开始安放皇后
+make_judge(chessPlant,0,0)
+
